@@ -238,8 +238,8 @@ if (!function_exists('system_check')) {
             throw new LlfException(34520006, ['7.3', PHP_VERSION]);
         }
 
-        // 如果是在云函数部署，则不需要检查这几项
-        if (IS_SCF) {
+        // 如果是在 云函数 或 Heroku 部署，则不需要检查这几项
+        if (IS_SCF || (int)env('IS_HEROKU') === 1) {
             system_log(lang('100009'));
             system_log(lang('100010'));
             system_log(lang('100011'));
@@ -282,7 +282,7 @@ if (!function_exists('get_local_num')) {
     {
         $num = (string)$num;
 
-        if (\config('language') === 'zh') {
+        if (is_chinese()) {
             return $num;
         }
 
@@ -298,5 +298,29 @@ if (!function_exists('get_local_num')) {
             default:
                 return $num . 'th';
         }
+    }
+}
+
+if (!function_exists('is_chinese')) {
+    /**
+     * 判断当前语言环境
+     *
+     * @return bool
+     */
+    function is_chinese()
+    {
+        return config('custom_language', 'zh') === 'zh';
+    }
+}
+
+if (!function_exists('get_ip_info')) {
+    /**
+     * 获取 ip 信息
+     *
+     * @return string
+     */
+    function get_ip_info()
+    {
+        return \Luolongfei\Libs\IP::getInstance()->get();
     }
 }
